@@ -5,3 +5,9 @@
 - Include images, video.
 - Can comment on someone’s profile to argue about their tastes or offer
   recommendations etc.
+
+# Setup
+
+```
+npm install
+```
