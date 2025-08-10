@@ -1,0 +1,40 @@
+$breakpoints: (
+  xs: 0,
+  sm: 480px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+  xxl: 1536px,
+);
+
+// Media query mixin
+/*
+Example usage:
+
+.button {
+  font-size: 1.4rem;
+
+  @include mq(md) {
+    & {
+      font-size: 1.6rem;
+    }
+  }
+
+  @include mq(lg) {
+    & {
+      font-size: 1.8rem;
+    }
+  }
+}
+*/
+@mixin mq($breakpoint) {
+  $value: map-get($breakpoints, $breakpoint);
+
+  @if $value != null {
+    @media (min-width: $value) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}";
+  }
+}

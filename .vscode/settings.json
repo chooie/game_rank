@@ -9,5 +9,8 @@
 
   // Tell VS Code to use Prettier for that language id
   "[jinja-html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[nunjucks]": { "editor.defaultFormatter": "esbenp.prettier-vscode" }
+  "[nunjucks]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": ["HTMX"]
 }
