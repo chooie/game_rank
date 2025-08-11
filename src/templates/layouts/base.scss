@@ -278,7 +278,9 @@ body {
   color: var(--body-color, var(--black));
   background-color: var(--body-bg-color, var(--white));
 
-  main.wrap {
+  main.main-wrap {
+    overflow-x: hidden;
+
     /* Should expand to take up full page height */
     flex: 1;
     position: relative;
@@ -311,19 +313,21 @@ img {
 }
 
 section.section {
-  align-items: center;
   display: flex;
+  align-items: center;
   flex-direction: column;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
 
-  .container {
-    align-items: flex-start;
+  .section-inner {
     display: flex;
+    align-items: flex-start;
     flex-direction: column;
     margin-left: auto;
     margin-right: auto;
+    max-width: var(--content-width);
+    width: 100%;
   }
 }
 
