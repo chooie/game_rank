@@ -15,9 +15,11 @@
     <link rel="stylesheet" href="/vendor/css/normalize.css" />
     <link rel="stylesheet" href="/dist/css/layouts/base.css" />
   </head>
-  <body>
+  <body class="page-{{page}}">
     {{! HTMX Core }}
     <script src="/vendor/js/htmx/htmx_2.0.6.js"></script>
-    {{{body}}}
+    <main class="wrap">
+      {{{body}}}
+    </main>
   </body>
 </html>

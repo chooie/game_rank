@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.get("/", (req, res) => {
   res.render("home", {
     title: `Home — ${APP_NAME}`,
+    page: "home",
     message: "Hello from Handlebars!",
   });
 });
@@ -54,7 +55,9 @@ app.get("/healthz", (_req, res) => res.send("ok"));
 
 // 404 (optional)
 app.use((req, res) => {
-  res.status(404).render("404", { title: `Not Found — ${APP_NAME}` });
+  res
+    .status(404)
+    .render("404", { title: `Not Found — ${APP_NAME}`, page: "404" });
 });
 
 // Start

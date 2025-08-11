@@ -33,6 +33,9 @@
   --section-space-xl:  clamp(12.794rem, calc(14.798vw + 8.058rem), 27rem);
   --section-space-xxl: clamp(17.054rem, calc(24.423vw + 9.238rem), 40.5rem);
   --section-padding-x: clamp(1rem, calc(0.625vw + 1rem), 3rem);
+
+  --section-padding-block: var(--section-space-m);
+  --section-gutter: 2.4rem;
   --gutter:            clamp(2.4rem, calc(0.625vw + 2.2rem), 3rem);
 
   /* Sections and layout gaps */
@@ -178,9 +181,18 @@
   --btn-border-width: 0.25rem;
   --btn-outline-border-width: 0.25rem;
   --btn-border-style: solid;
-  --btn-border-radius: var(--radius-m);
+  --btn-border-radius: var(--radius);
   --btn-justify-content: center;
   --btn-text-align: center;
+
+  --btn-border-size: 0.25rem;
+  --btn-radius: var(--radius);
+  --outline-btn-border-size: 0.25rem;
+  --btn-pad-x: 1.5em;
+  --btn-pad-y: 0.75em;
+  --btn-text-style: normal;
+  --btn-weight: 400;
+  --btn-width: 14;
 
   /* Link */
   --link-color: var(--action);
@@ -235,6 +247,12 @@
                 translate var(--transition-duration) var(--transition-timing) var(--transition-delay);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
   /**
    * Set base font-size to 62.5% (of the browser default 16px),
@@ -245,7 +263,13 @@ html {
 }
 
 body {
-  min-block-size: 100vh;
+  min-block-size: 100svh;
+
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+
   font-family: "Source Sans 3", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: var(--default-font-size, var(--text-m));
   line-height: var(--text-line-height);
@@ -253,6 +277,17 @@ body {
 
   color: var(--body-color, var(--black));
   background-color: var(--body-bg-color, var(--white));
+
+  main.wrap {
+    /* Should expand to take up full page height */
+    flex: 1;
+    position: relative;
+    width: 100%;
+
+    & > * {
+      max-width: 100%;
+    }
+  }
 }
 
 input,
@@ -267,12 +302,35 @@ img {
   object-position: var(--object-position, 50% 50%);
 }
 
-.dhs-icon {
+.icon {
   display: inline-block;
   inline-size: 1em; /* width */
   block-size: 1em; /* height */
   vertical-align: -0.125em; /* optional optical tweak */
   color: currentColor; /* usually redundant, but explicit */
+}
+
+section.section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+
+  .container {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Only applies to top-level sections */
+:where(section:not(section section)) {
+  padding-block: var(--section-padding-block);
+  padding-inline: var(--gutter);
 }
 
 blockquote {
@@ -757,6 +815,11 @@ h6 a {
 .btn--xxl {
   font-size: var(--text-xxl);
 }
+
+a[class*="btn--"] {
+  display: inline-flex;
+}
+
 .btn--clear.btn--clear,
 .btn--none.btn--none {
   background: none;
