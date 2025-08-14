@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import express from "express";
 import { engine } from "express-handlebars";
 
+import registerRoutes from "./routes/_routes.js";
+
 // Load env
 dotenv.config();
 
@@ -28,6 +30,8 @@ db.exec(`
 const app = express();
 
 const APP_NAME = "Game Rank";
+app.locals.APP_NAME = APP_NAME; // available in all res.render() calls
+
 const PORT = Number(process.env.PORT) || 3000;
 const IS_DEV = process.env.NODE_ENV === "development";
 
@@ -52,59 +56,7 @@ app.use(express.json());
 // Everything can be served from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));
 
-const clicked_route = "/home/htmx/clicked";
-const insert_users_route = "/insert-users";
-
-// ==========================
-// Routes
-// ==========================
-
-app.get("/", (req, res) => {
-  res.render("home", {
-    title: `Home — ${APP_NAME}`,
-    page: "home",
-    message: "Hello from Handlebars!",
-    htmx_routes: { clicked: clicked_route, insert_users: insert_users_route },
-  });
-});
-
-app.get(clicked_route, (req, res) => {
-  res.render("home__server_time", {
-    layout: false, // important: no main layout
-    message: "Server says hello 👋",
-    serverTime: new Date().toLocaleTimeString(),
-  });
-});
-
-app.get("/healthz", (_req, res) => res.send("ok"));
-
-const insertUser = db.prepare("INSERT INTO users (name, age) VALUES (?, ?)");
-const getAllUsers = db.prepare("SELECT * FROM users");
-
-app.post(insert_users_route, (req, res) => {
-  try {
-    insertUser.run("Alice", 25);
-    insertUser.run("Bob", 30);
-
-    const users = getAllUsers.all(); // Returns an array of objects
-    res.render("home__users", { layout: false, users }); // Pass array to template
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error inserting users");
-  }
-});
-
-app.get("/users", (req, res) => {
-  const users = getAllUsers.all(); // Returns an array of objects
-  res.render("users", { layout: false, users }); // Pass array to template
-});
-
-// 404 (optional)
-app.use((req, res) => {
-  res
-    .status(404)
-    .render("404", { title: `Not Found — ${APP_NAME}`, page: "404" });
-});
+registerRoutes(app, db);
 
 // Start
 app.listen(PORT, () => {
