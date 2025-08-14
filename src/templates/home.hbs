@@ -1,5 +1,3 @@
-<% layout("layouts/base") %>
-
 <link rel="stylesheet" href="/dist/css/home.css" />
 
 <section class="section bg--dark home-section-intro">
@@ -8,26 +6,40 @@
       <img src="/img/blade_runner.jpg" alt="" />
     </div>
     <h1>Home Page</h1>
-    <p><%= it.message %></p>
-    <p>Shouted: <%= it.message %></p>
+    <p>{{message}}</p>
+    <p>Shouted: {{shout message}}</p>
   </div>
 </section>
 
-
-<% const parentElement = "parent-id"  %>
 <section class="section">
   <div class="section__inner">
     <h2>HTMX Example</h2>
-    <div id="<%= parentElement %>">
+    <div id="parent-element">
       <button
         class="btn--primary"
-        hx-get="<%= it.htmx_routes.clicked %>"
+        hx-get="{{htmx_routes.clicked}}"
         hx-trigger="click"
-        hx-target="#<%= parentElement %>"
+        hx-target="#parent-element"
         hx-swap="outerHTML"
       >
         Click Me!
       </button>
     </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section__inner">
+    <h2>HTMX DB Example</h2>
+    <button
+      class="btn--primary"
+      hx-post="{{htmx_routes.insert_users}}"
+      hx-trigger="click"
+      hx-target="#users-display"
+      hx-swap="innerHTML"
+    >
+      Create more users!
+    </button>
+    <div id="users-display"></div>
   </div>
 </section>

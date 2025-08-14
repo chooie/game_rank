@@ -8,8 +8,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "better-sqlite3": "12.2.0",
     "dotenv": "17.2.1",
-    "eta": "3.5.0",
     "express": "5.1.0",
     "express-handlebars": "8.0.3",
     "sass": "1.90.0",

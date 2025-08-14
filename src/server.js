@@ -1,8 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import Database from "better-sqlite3";
 import dotenv from "dotenv";
-import { Eta } from "eta";
 import express from "express";
 import { engine } from "express-handlebars";
 
@@ -14,12 +14,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const VIEWS_DIR = path.join(__dirname, "templates");
 
+const db = new Database("foobar.db");
+db.pragma("journal_mode = WAL");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    age INTEGER
+  )
+`);
+
 const app = express();
 
 const APP_NAME = "Game Rank";
 const PORT = Number(process.env.PORT) || 3000;
 const IS_DEV = process.env.NODE_ENV === "development";
-const IS_DEBUG = true;
 
 // Handlebars
 app.engine(
@@ -36,11 +46,6 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", VIEWS_DIR);
 
-const eta = new Eta({
-  views: VIEWS_DIR,
-  cache: true && !IS_DEV,
-});
-
 // Middleware
 app.use(express.json());
 
@@ -48,19 +53,19 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 
 const clicked_route = "/home/htmx/clicked";
+const insert_users_route = "/insert-users";
 
 // ==========================
 // Routes
 // ==========================
 
-app.get("/", (req, res, next) => {
-  const html = eta.render("home", {
+app.get("/", (req, res) => {
+  res.render("home", {
     title: `Home — ${APP_NAME}`,
     page: "home",
-    message: "Hello from Eta!",
-    htmx_routes: { clicked: clicked_route },
+    message: "Hello from Handlebars!",
+    htmx_routes: { clicked: clicked_route, insert_users: insert_users_route },
   });
-  res.send(html);
 });
 
 app.get(clicked_route, (req, res) => {
@@ -72,6 +77,27 @@ app.get(clicked_route, (req, res) => {
 });
 
 app.get("/healthz", (_req, res) => res.send("ok"));
+
+const insertUser = db.prepare("INSERT INTO users (name, age) VALUES (?, ?)");
+const getAllUsers = db.prepare("SELECT * FROM users");
+
+app.post(insert_users_route, (req, res) => {
+  try {
+    insertUser.run("Alice", 25);
+    insertUser.run("Bob", 30);
+
+    const users = getAllUsers.all(); // Returns an array of objects
+    res.render("home__users", { layout: false, users }); // Pass array to template
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error inserting users");
+  }
+});
+
+app.get("/users", (req, res) => {
+  const users = getAllUsers.all(); // Returns an array of objects
+  res.render("users", { layout: false, users }); // Pass array to template
+});
 
 // 404 (optional)
 app.use((req, res) => {
