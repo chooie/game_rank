@@ -1,0 +1,717 @@
+[class*="overlay--"] {
+  position: relative;
+  z-index: 0;
+}
+[class*="overlay--"]::before {
+  content: "";
+  background: var(--overlay-background);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.overlay--accent-trans-10 {
+  --overlay-background: var(--accent-trans-10);
+}
+.overlay--accent-trans-20 {
+  --overlay-background: var(--accent-trans-20);
+}
+.overlay--accent-trans-30 {
+  --overlay-background: var(--accent-trans-30);
+}
+.overlay--accent-trans-40 {
+  --overlay-background: var(--accent-trans-40);
+}
+.overlay--accent-trans-50 {
+  --overlay-background: var(--accent-trans-50);
+}
+.overlay--accent-trans-60 {
+  --overlay-background: var(--accent-trans-60);
+}
+.overlay--accent-trans-70 {
+  --overlay-background: var(--accent-trans-70);
+}
+.overlay--accent-trans-80 {
+  --overlay-background: var(--accent-trans-80);
+}
+.overlay--accent-trans-90 {
+  --overlay-background: var(--accent-trans-90);
+}
+.overlay--accent-light-trans-10 {
+  --overlay-background: var(--accent-light-trans-10);
+}
+.overlay--accent-light-trans-20 {
+  --overlay-background: var(--accent-light-trans-20);
+}
+.overlay--accent-light-trans-30 {
+  --overlay-background: var(--accent-light-trans-30);
+}
+.overlay--accent-light-trans-40 {
+  --overlay-background: var(--accent-light-trans-40);
+}
+.overlay--accent-light-trans-50 {
+  --overlay-background: var(--accent-light-trans-50);
+}
+.overlay--accent-light-trans-60 {
+  --overlay-background: var(--accent-light-trans-60);
+}
+.overlay--accent-light-trans-70 {
+  --overlay-background: var(--accent-light-trans-70);
+}
+.overlay--accent-light-trans-80 {
+  --overlay-background: var(--accent-light-trans-80);
+}
+.overlay--accent-light-trans-90 {
+  --overlay-background: var(--accent-light-trans-90);
+}
+.overlay--accent-dark-trans-10 {
+  --overlay-background: var(--accent-dark-trans-10);
+}
+.overlay--accent-dark-trans-20 {
+  --overlay-background: var(--accent-dark-trans-20);
+}
+.overlay--accent-dark-trans-30 {
+  --overlay-background: var(--accent-dark-trans-30);
+}
+.overlay--accent-dark-trans-40 {
+  --overlay-background: var(--accent-dark-trans-40);
+}
+.overlay--accent-dark-trans-50 {
+  --overlay-background: var(--accent-dark-trans-50);
+}
+.overlay--accent-dark-trans-60 {
+  --overlay-background: var(--accent-dark-trans-60);
+}
+.overlay--accent-dark-trans-70 {
+  --overlay-background: var(--accent-dark-trans-70);
+}
+.overlay--accent-dark-trans-80 {
+  --overlay-background: var(--accent-dark-trans-80);
+}
+.overlay--accent-dark-trans-90 {
+  --overlay-background: var(--accent-dark-trans-90);
+}
+.overlay--accent-ultra-dark-trans-10 {
+  --overlay-background: var(--accent-ultra-dark-trans-10);
+}
+.overlay--accent-ultra-dark-trans-20 {
+  --overlay-background: var(--accent-ultra-dark-trans-20);
+}
+.overlay--accent-ultra-dark-trans-30 {
+  --overlay-background: var(--accent-ultra-dark-trans-30);
+}
+.overlay--accent-ultra-dark-trans-40 {
+  --overlay-background: var(--accent-ultra-dark-trans-40);
+}
+.overlay--accent-ultra-dark-trans-50 {
+  --overlay-background: var(--accent-ultra-dark-trans-50);
+}
+.overlay--accent-ultra-dark-trans-60 {
+  --overlay-background: var(--accent-ultra-dark-trans-60);
+}
+.overlay--accent-ultra-dark-trans-70 {
+  --overlay-background: var(--accent-ultra-dark-trans-70);
+}
+.overlay--accent-ultra-dark-trans-80 {
+  --overlay-background: var(--accent-ultra-dark-trans-80);
+}
+.overlay--accent-ultra-dark-trans-90 {
+  --overlay-background: var(--accent-ultra-dark-trans-90);
+}
+.overlay--primary-trans-10 {
+  --overlay-background: var(--primary-trans-10);
+}
+.overlay--primary-trans-20 {
+  --overlay-background: var(--primary-trans-20);
+}
+.overlay--primary-trans-30 {
+  --overlay-background: var(--primary-trans-30);
+}
+.overlay--primary-trans-40 {
+  --overlay-background: var(--primary-trans-40);
+}
+.overlay--primary-trans-50 {
+  --overlay-background: var(--primary-trans-50);
+}
+.overlay--primary-trans-60 {
+  --overlay-background: var(--primary-trans-60);
+}
+.overlay--primary-trans-70 {
+  --overlay-background: var(--primary-trans-70);
+}
+.overlay--primary-trans-80 {
+  --overlay-background: var(--primary-trans-80);
+}
+.overlay--primary-trans-90 {
+  --overlay-background: var(--primary-trans-90);
+}
+.overlay--primary-light-trans-10 {
+  --overlay-background: var(--primary-light-trans-10);
+}
+.overlay--primary-light-trans-20 {
+  --overlay-background: var(--primary-light-trans-20);
+}
+.overlay--primary-light-trans-30 {
+  --overlay-background: var(--primary-light-trans-30);
+}
+.overlay--primary-light-trans-40 {
+  --overlay-background: var(--primary-light-trans-40);
+}
+.overlay--primary-light-trans-50 {
+  --overlay-background: var(--primary-light-trans-50);
+}
+.overlay--primary-light-trans-60 {
+  --overlay-background: var(--primary-light-trans-60);
+}
+.overlay--primary-light-trans-70 {
+  --overlay-background: var(--primary-light-trans-70);
+}
+.overlay--primary-light-trans-80 {
+  --overlay-background: var(--primary-light-trans-80);
+}
+.overlay--primary-light-trans-90 {
+  --overlay-background: var(--primary-light-trans-90);
+}
+.overlay--primary-dark-trans-10 {
+  --overlay-background: var(--primary-dark-trans-10);
+}
+.overlay--primary-dark-trans-20 {
+  --overlay-background: var(--primary-dark-trans-20);
+}
+.overlay--primary-dark-trans-30 {
+  --overlay-background: var(--primary-dark-trans-30);
+}
+.overlay--primary-dark-trans-40 {
+  --overlay-background: var(--primary-dark-trans-40);
+}
+.overlay--primary-dark-trans-50 {
+  --overlay-background: var(--primary-dark-trans-50);
+}
+.overlay--primary-dark-trans-60 {
+  --overlay-background: var(--primary-dark-trans-60);
+}
+.overlay--primary-dark-trans-70 {
+  --overlay-background: var(--primary-dark-trans-70);
+}
+.overlay--primary-dark-trans-80 {
+  --overlay-background: var(--primary-dark-trans-80);
+}
+.overlay--primary-dark-trans-90 {
+  --overlay-background: var(--primary-dark-trans-90);
+}
+.overlay--primary-ultra-dark-trans-10 {
+  --overlay-background: var(--primary-ultra-dark-trans-10);
+}
+.overlay--primary-ultra-dark-trans-20 {
+  --overlay-background: var(--primary-ultra-dark-trans-20);
+}
+.overlay--primary-ultra-dark-trans-30 {
+  --overlay-background: var(--primary-ultra-dark-trans-30);
+}
+.overlay--primary-ultra-dark-trans-40 {
+  --overlay-background: var(--primary-ultra-dark-trans-40);
+}
+.overlay--primary-ultra-dark-trans-50 {
+  --overlay-background: var(--primary-ultra-dark-trans-50);
+}
+.overlay--primary-ultra-dark-trans-60 {
+  --overlay-background: var(--primary-ultra-dark-trans-60);
+}
+.overlay--primary-ultra-dark-trans-70 {
+  --overlay-background: var(--primary-ultra-dark-trans-70);
+}
+.overlay--primary-ultra-dark-trans-80 {
+  --overlay-background: var(--primary-ultra-dark-trans-80);
+}
+.overlay--primary-ultra-dark-trans-90 {
+  --overlay-background: var(--primary-ultra-dark-trans-90);
+}
+.overlay--secondary-trans-10 {
+  --overlay-background: var(--secondary-trans-10);
+}
+.overlay--secondary-trans-20 {
+  --overlay-background: var(--secondary-trans-20);
+}
+.overlay--secondary-trans-30 {
+  --overlay-background: var(--secondary-trans-30);
+}
+.overlay--secondary-trans-40 {
+  --overlay-background: var(--secondary-trans-40);
+}
+.overlay--secondary-trans-50 {
+  --overlay-background: var(--secondary-trans-50);
+}
+.overlay--secondary-trans-60 {
+  --overlay-background: var(--secondary-trans-60);
+}
+.overlay--secondary-trans-70 {
+  --overlay-background: var(--secondary-trans-70);
+}
+.overlay--secondary-trans-80 {
+  --overlay-background: var(--secondary-trans-80);
+}
+.overlay--secondary-trans-90 {
+  --overlay-background: var(--secondary-trans-90);
+}
+.overlay--secondary-light-trans-10 {
+  --overlay-background: var(--secondary-light-trans-10);
+}
+.overlay--secondary-light-trans-20 {
+  --overlay-background: var(--secondary-light-trans-20);
+}
+.overlay--secondary-light-trans-30 {
+  --overlay-background: var(--secondary-light-trans-30);
+}
+.overlay--secondary-light-trans-40 {
+  --overlay-background: var(--secondary-light-trans-40);
+}
+.overlay--secondary-light-trans-50 {
+  --overlay-background: var(--secondary-light-trans-50);
+}
+.overlay--secondary-light-trans-60 {
+  --overlay-background: var(--secondary-light-trans-60);
+}
+.overlay--secondary-light-trans-70 {
+  --overlay-background: var(--secondary-light-trans-70);
+}
+.overlay--secondary-light-trans-80 {
+  --overlay-background: var(--secondary-light-trans-80);
+}
+.overlay--secondary-light-trans-90 {
+  --overlay-background: var(--secondary-light-trans-90);
+}
+.overlay--secondary-dark-trans-10 {
+  --overlay-background: var(--secondary-dark-trans-10);
+}
+.overlay--secondary-dark-trans-20 {
+  --overlay-background: var(--secondary-dark-trans-20);
+}
+.overlay--secondary-dark-trans-30 {
+  --overlay-background: var(--secondary-dark-trans-30);
+}
+.overlay--secondary-dark-trans-40 {
+  --overlay-background: var(--secondary-dark-trans-40);
+}
+.overlay--secondary-dark-trans-50 {
+  --overlay-background: var(--secondary-dark-trans-50);
+}
+.overlay--secondary-dark-trans-60 {
+  --overlay-background: var(--secondary-dark-trans-60);
+}
+.overlay--secondary-dark-trans-70 {
+  --overlay-background: var(--secondary-dark-trans-70);
+}
+.overlay--secondary-dark-trans-80 {
+  --overlay-background: var(--secondary-dark-trans-80);
+}
+.overlay--secondary-dark-trans-90 {
+  --overlay-background: var(--secondary-dark-trans-90);
+}
+.overlay--secondary-ultra-dark-trans-10 {
+  --overlay-background: var(--secondary-ultra-dark-trans-10);
+}
+.overlay--secondary-ultra-dark-trans-20 {
+  --overlay-background: var(--secondary-ultra-dark-trans-20);
+}
+.overlay--secondary-ultra-dark-trans-30 {
+  --overlay-background: var(--secondary-ultra-dark-trans-30);
+}
+.overlay--secondary-ultra-dark-trans-40 {
+  --overlay-background: var(--secondary-ultra-dark-trans-40);
+}
+.overlay--secondary-ultra-dark-trans-50 {
+  --overlay-background: var(--secondary-ultra-dark-trans-50);
+}
+.overlay--secondary-ultra-dark-trans-60 {
+  --overlay-background: var(--secondary-ultra-dark-trans-60);
+}
+.overlay--secondary-ultra-dark-trans-70 {
+  --overlay-background: var(--secondary-ultra-dark-trans-70);
+}
+.overlay--secondary-ultra-dark-trans-80 {
+  --overlay-background: var(--secondary-ultra-dark-trans-80);
+}
+.overlay--secondary-ultra-dark-trans-90 {
+  --overlay-background: var(--secondary-ultra-dark-trans-90);
+}
+.overlay--base-trans-10 {
+  --overlay-background: var(--base-trans-10);
+}
+.overlay--base-trans-20 {
+  --overlay-background: var(--base-trans-20);
+}
+.overlay--base-trans-30 {
+  --overlay-background: var(--base-trans-30);
+}
+.overlay--base-trans-40 {
+  --overlay-background: var(--base-trans-40);
+}
+.overlay--base-trans-50 {
+  --overlay-background: var(--base-trans-50);
+}
+.overlay--base-trans-60 {
+  --overlay-background: var(--base-trans-60);
+}
+.overlay--base-trans-70 {
+  --overlay-background: var(--base-trans-70);
+}
+.overlay--base-trans-80 {
+  --overlay-background: var(--base-trans-80);
+}
+.overlay--base-trans-90 {
+  --overlay-background: var(--base-trans-90);
+}
+.overlay--base-light-trans-10 {
+  --overlay-background: var(--base-light-trans-10);
+}
+.overlay--base-light-trans-20 {
+  --overlay-background: var(--base-light-trans-20);
+}
+.overlay--base-light-trans-30 {
+  --overlay-background: var(--base-light-trans-30);
+}
+.overlay--base-light-trans-40 {
+  --overlay-background: var(--base-light-trans-40);
+}
+.overlay--base-light-trans-50 {
+  --overlay-background: var(--base-light-trans-50);
+}
+.overlay--base-light-trans-60 {
+  --overlay-background: var(--base-light-trans-60);
+}
+.overlay--base-light-trans-70 {
+  --overlay-background: var(--base-light-trans-70);
+}
+.overlay--base-light-trans-80 {
+  --overlay-background: var(--base-light-trans-80);
+}
+.overlay--base-light-trans-90 {
+  --overlay-background: var(--base-light-trans-90);
+}
+.overlay--base-dark-trans-10 {
+  --overlay-background: var(--base-dark-trans-10);
+}
+.overlay--base-dark-trans-20 {
+  --overlay-background: var(--base-dark-trans-20);
+}
+.overlay--base-dark-trans-30 {
+  --overlay-background: var(--base-dark-trans-30);
+}
+.overlay--base-dark-trans-40 {
+  --overlay-background: var(--base-dark-trans-40);
+}
+.overlay--base-dark-trans-50 {
+  --overlay-background: var(--base-dark-trans-50);
+}
+.overlay--base-dark-trans-60 {
+  --overlay-background: var(--base-dark-trans-60);
+}
+.overlay--base-dark-trans-70 {
+  --overlay-background: var(--base-dark-trans-70);
+}
+.overlay--base-dark-trans-80 {
+  --overlay-background: var(--base-dark-trans-80);
+}
+.overlay--base-dark-trans-90 {
+  --overlay-background: var(--base-dark-trans-90);
+}
+.overlay--base-ultra-dark-trans-10 {
+  --overlay-background: var(--base-ultra-dark-trans-10);
+}
+.overlay--base-ultra-dark-trans-20 {
+  --overlay-background: var(--base-ultra-dark-trans-20);
+}
+.overlay--base-ultra-dark-trans-30 {
+  --overlay-background: var(--base-ultra-dark-trans-30);
+}
+.overlay--base-ultra-dark-trans-40 {
+  --overlay-background: var(--base-ultra-dark-trans-40);
+}
+.overlay--base-ultra-dark-trans-50 {
+  --overlay-background: var(--base-ultra-dark-trans-50);
+}
+.overlay--base-ultra-dark-trans-60 {
+  --overlay-background: var(--base-ultra-dark-trans-60);
+}
+.overlay--base-ultra-dark-trans-70 {
+  --overlay-background: var(--base-ultra-dark-trans-70);
+}
+.overlay--base-ultra-dark-trans-80 {
+  --overlay-background: var(--base-ultra-dark-trans-80);
+}
+.overlay--base-ultra-dark-trans-90 {
+  --overlay-background: var(--base-ultra-dark-trans-90);
+}
+.overlay--shade-trans-10 {
+  --overlay-background: var(--shade-trans-10);
+}
+.overlay--shade-trans-20 {
+  --overlay-background: var(--shade-trans-20);
+}
+.overlay--shade-trans-30 {
+  --overlay-background: var(--shade-trans-30);
+}
+.overlay--shade-trans-40 {
+  --overlay-background: var(--shade-trans-40);
+}
+.overlay--shade-trans-50 {
+  --overlay-background: var(--shade-trans-50);
+}
+.overlay--shade-trans-60 {
+  --overlay-background: var(--shade-trans-60);
+}
+.overlay--shade-trans-70 {
+  --overlay-background: var(--shade-trans-70);
+}
+.overlay--shade-trans-80 {
+  --overlay-background: var(--shade-trans-80);
+}
+.overlay--shade-trans-90 {
+  --overlay-background: var(--shade-trans-90);
+}
+.overlay--shade-light-trans-10 {
+  --overlay-background: var(--shade-light-trans-10);
+}
+.overlay--shade-light-trans-20 {
+  --overlay-background: var(--shade-light-trans-20);
+}
+.overlay--shade-light-trans-30 {
+  --overlay-background: var(--shade-light-trans-30);
+}
+.overlay--shade-light-trans-40 {
+  --overlay-background: var(--shade-light-trans-40);
+}
+.overlay--shade-light-trans-50 {
+  --overlay-background: var(--shade-light-trans-50);
+}
+.overlay--shade-light-trans-60 {
+  --overlay-background: var(--shade-light-trans-60);
+}
+.overlay--shade-light-trans-70 {
+  --overlay-background: var(--shade-light-trans-70);
+}
+.overlay--shade-light-trans-80 {
+  --overlay-background: var(--shade-light-trans-80);
+}
+.overlay--shade-light-trans-90 {
+  --overlay-background: var(--shade-light-trans-90);
+}
+.overlay--shade-dark-trans-10 {
+  --overlay-background: var(--shade-dark-trans-10);
+}
+.overlay--shade-dark-trans-20 {
+  --overlay-background: var(--shade-dark-trans-20);
+}
+.overlay--shade-dark-trans-30 {
+  --overlay-background: var(--shade-dark-trans-30);
+}
+.overlay--shade-dark-trans-40 {
+  --overlay-background: var(--shade-dark-trans-40);
+}
+.overlay--shade-dark-trans-50 {
+  --overlay-background: var(--shade-dark-trans-50);
+}
+.overlay--shade-dark-trans-60 {
+  --overlay-background: var(--shade-dark-trans-60);
+}
+.overlay--shade-dark-trans-70 {
+  --overlay-background: var(--shade-dark-trans-70);
+}
+.overlay--shade-dark-trans-80 {
+  --overlay-background: var(--shade-dark-trans-80);
+}
+.overlay--shade-dark-trans-90 {
+  --overlay-background: var(--shade-dark-trans-90);
+}
+.overlay--shade-ultra-dark-trans-10 {
+  --overlay-background: var(--shade-ultra-dark-trans-10);
+}
+.overlay--shade-ultra-dark-trans-20 {
+  --overlay-background: var(--shade-ultra-dark-trans-20);
+}
+.overlay--shade-ultra-dark-trans-30 {
+  --overlay-background: var(--shade-ultra-dark-trans-30);
+}
+.overlay--shade-ultra-dark-trans-40 {
+  --overlay-background: var(--shade-ultra-dark-trans-40);
+}
+.overlay--shade-ultra-dark-trans-50 {
+  --overlay-background: var(--shade-ultra-dark-trans-50);
+}
+.overlay--shade-ultra-dark-trans-60 {
+  --overlay-background: var(--shade-ultra-dark-trans-60);
+}
+.overlay--shade-ultra-dark-trans-70 {
+  --overlay-background: var(--shade-ultra-dark-trans-70);
+}
+.overlay--shade-ultra-dark-trans-80 {
+  --overlay-background: var(--shade-ultra-dark-trans-80);
+}
+.overlay--shade-ultra-dark-trans-90 {
+  --overlay-background: var(--shade-ultra-dark-trans-90);
+}
+.overlay--neutral-trans-10 {
+  --overlay-background: var(--neutral-trans-10);
+}
+.overlay--neutral-trans-20 {
+  --overlay-background: var(--neutral-trans-20);
+}
+.overlay--neutral-trans-30 {
+  --overlay-background: var(--neutral-trans-30);
+}
+.overlay--neutral-trans-40 {
+  --overlay-background: var(--neutral-trans-40);
+}
+.overlay--neutral-trans-50 {
+  --overlay-background: var(--neutral-trans-50);
+}
+.overlay--neutral-trans-60 {
+  --overlay-background: var(--neutral-trans-60);
+}
+.overlay--neutral-trans-70 {
+  --overlay-background: var(--neutral-trans-70);
+}
+.overlay--neutral-trans-80 {
+  --overlay-background: var(--neutral-trans-80);
+}
+.overlay--neutral-trans-90 {
+  --overlay-background: var(--neutral-trans-90);
+}
+.overlay--neutral-light-trans-10 {
+  --overlay-background: var(--neutral-light-trans-10);
+}
+.overlay--neutral-light-trans-20 {
+  --overlay-background: var(--neutral-light-trans-20);
+}
+.overlay--neutral-light-trans-30 {
+  --overlay-background: var(--neutral-light-trans-30);
+}
+.overlay--neutral-light-trans-40 {
+  --overlay-background: var(--neutral-light-trans-40);
+}
+.overlay--neutral-light-trans-50 {
+  --overlay-background: var(--neutral-light-trans-50);
+}
+.overlay--neutral-light-trans-60 {
+  --overlay-background: var(--neutral-light-trans-60);
+}
+.overlay--neutral-light-trans-70 {
+  --overlay-background: var(--neutral-light-trans-70);
+}
+.overlay--neutral-light-trans-80 {
+  --overlay-background: var(--neutral-light-trans-80);
+}
+.overlay--neutral-light-trans-90 {
+  --overlay-background: var(--neutral-light-trans-90);
+}
+.overlay--neutral-dark-trans-10 {
+  --overlay-background: var(--neutral-dark-trans-10);
+}
+.overlay--neutral-dark-trans-20 {
+  --overlay-background: var(--neutral-dark-trans-20);
+}
+.overlay--neutral-dark-trans-30 {
+  --overlay-background: var(--neutral-dark-trans-30);
+}
+.overlay--neutral-dark-trans-40 {
+  --overlay-background: var(--neutral-dark-trans-40);
+}
+.overlay--neutral-dark-trans-50 {
+  --overlay-background: var(--neutral-dark-trans-50);
+}
+.overlay--neutral-dark-trans-60 {
+  --overlay-background: var(--neutral-dark-trans-60);
+}
+.overlay--neutral-dark-trans-70 {
+  --overlay-background: var(--neutral-dark-trans-70);
+}
+.overlay--neutral-dark-trans-80 {
+  --overlay-background: var(--neutral-dark-trans-80);
+}
+.overlay--neutral-dark-trans-90 {
+  --overlay-background: var(--neutral-dark-trans-90);
+}
+.overlay--neutral-ultra-dark-trans-10 {
+  --overlay-background: var(--neutral-ultra-dark-trans-10);
+}
+.overlay--neutral-ultra-dark-trans-20 {
+  --overlay-background: var(--neutral-ultra-dark-trans-20);
+}
+.overlay--neutral-ultra-dark-trans-30 {
+  --overlay-background: var(--neutral-ultra-dark-trans-30);
+}
+.overlay--neutral-ultra-dark-trans-40 {
+  --overlay-background: var(--neutral-ultra-dark-trans-40);
+}
+.overlay--neutral-ultra-dark-trans-50 {
+  --overlay-background: var(--neutral-ultra-dark-trans-50);
+}
+.overlay--neutral-ultra-dark-trans-60 {
+  --overlay-background: var(--neutral-ultra-dark-trans-60);
+}
+.overlay--neutral-ultra-dark-trans-70 {
+  --overlay-background: var(--neutral-ultra-dark-trans-70);
+}
+.overlay--neutral-ultra-dark-trans-80 {
+  --overlay-background: var(--neutral-ultra-dark-trans-80);
+}
+.overlay--neutral-ultra-dark-trans-90 {
+  --overlay-background: var(--neutral-ultra-dark-trans-90);
+}
+.overlay--white-trans-10 {
+  --overlay-background: var(--white-trans-10);
+}
+.overlay--white-trans-20 {
+  --overlay-background: var(--white-trans-20);
+}
+.overlay--white-trans-30 {
+  --overlay-background: var(--white-trans-30);
+}
+.overlay--white-trans-40 {
+  --overlay-background: var(--white-trans-40);
+}
+.overlay--white-trans-50 {
+  --overlay-background: var(--white-trans-50);
+}
+.overlay--white-trans-60 {
+  --overlay-background: var(--white-trans-60);
+}
+.overlay--white-trans-70 {
+  --overlay-background: var(--white-trans-70);
+}
+.overlay--white-trans-80 {
+  --overlay-background: var(--white-trans-80);
+}
+.overlay--white-trans-90 {
+  --overlay-background: var(--white-trans-90);
+}
+.overlay--black-trans-10 {
+  --overlay-background: var(--black-trans-10);
+}
+.overlay--black-trans-20 {
+  --overlay-background: var(--black-trans-20);
+}
+.overlay--black-trans-30 {
+  --overlay-background: var(--black-trans-30);
+}
+.overlay--black-trans-40 {
+  --overlay-background: var(--black-trans-40);
+}
+.overlay--black-trans-50 {
+  --overlay-background: var(--black-trans-50);
+}
+.overlay--black-trans-60 {
+  --overlay-background: var(--black-trans-60);
+}
+.overlay--black-trans-70 {
+  --overlay-background: var(--black-trans-70);
+}
+.overlay--black-trans-80 {
+  --overlay-background: var(--black-trans-80);
+}
+.overlay--black-trans-90 {
+  --overlay-background: var(--black-trans-90);
+}
+figure[class*="overlay--"]::before {
+  z-index: 0;
+}

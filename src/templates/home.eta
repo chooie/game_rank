@@ -1,0 +1,33 @@
+<% layout("layouts/base") %>
+
+<link rel="stylesheet" href="/dist/css/home.css" />
+
+<section class="section bg--dark home-section-intro">
+  <div class="section__inner">
+    <div class="is-bg overlay--neutral-ultra-dark-trans-90">
+      <img src="/img/blade_runner.jpg" alt="" />
+    </div>
+    <h1>Home Page</h1>
+    <p><%= it.message %></p>
+    <p>Shouted: <%= it.message %></p>
+  </div>
+</section>
+
+
+<% const parentElement = "parent-id"  %>
+<section class="section">
+  <div class="section__inner">
+    <h2>HTMX Example</h2>
+    <div id="<%= parentElement %>">
+      <button
+        class="btn--primary"
+        hx-get="<%= it.htmx_routes.clicked %>"
+        hx-trigger="click"
+        hx-target="#<%= parentElement %>"
+        hx-swap="outerHTML"
+      >
+        Click Me!
+      </button>
+    </div>
+  </div>
+</section>

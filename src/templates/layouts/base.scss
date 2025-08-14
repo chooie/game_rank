@@ -102,7 +102,7 @@
   --width-70: calc(var(--content-width) * 0.7);
   --width-80: calc(var(--content-width) * 0.8);
   --width-90: calc(var(--content-width) * 0.9);
-  --focus-color: var(--action);
+  --focus-color: var(--accent);
   --focus-width: 0.2rem;
   --focus-offset: 0.25em;
 
@@ -195,8 +195,8 @@
   --btn-width: 14;
 
   /* Link */
-  --link-color: var(--action);
-  --link-color-hover: var(--action-hover);
+  --link-color: var(--accent);
+  --link-color-hover: var(--accent-hover);
   --link-transition: var(--transition);
   --link-decoration: inherit;
   --link-decoration-hover: inherit;
@@ -300,6 +300,7 @@ select {
 }
 
 img {
+  max-width: 100%;
   object-fit: var(--object-fit, cover);
   object-position: var(--object-position, 50% 50%);
 }
@@ -312,7 +313,7 @@ img {
   color: currentColor; /* usually redundant, but explicit */
 }
 
-section.section {
+.section {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -320,7 +321,7 @@ section.section {
   margin-right: auto;
   width: 100%;
 
-  .section-inner {
+  &__inner {
     display: flex;
     align-items: flex-start;
     flex-direction: column;
@@ -417,7 +418,7 @@ h6 {
 body a:where(:not([class*="btn--"])) {
   color: var(
     --link-color,
-    var(--action)
+    var(--accent)
   ) !important; /* TODO(CTH): can remove the '!important' when we no longer rely on BigCommerce citadel */
   font-weight: var(--link-weight, inherit);
   -webkit-text-decoration: var(--link-decoration, inherit);
@@ -429,7 +430,7 @@ body a:where(:not([class*="btn--"])) {
   body a:where(:not([class*="btn--"])):hover {
     color: var(
       --link-color-hover,
-      var(--action-hover)
+      var(--accent-hover)
     ) !important; /* TODO(CTH): can remove the '!important' when we no longer rely on BigCommerce citadel */
   }
 }
@@ -489,6 +490,63 @@ h6 a {
 
 // ############################################################################
 // >>> Light and Dark Mode Support
+
+:has(> .is-bg) {
+  position: relative;
+  isolation: isolate;
+}
+:is(*, img, figure, picture).is-bg {
+  overflow: hidden;
+  position: var(--bg-position, absolute);
+  inset: var(--bg-inset, 0);
+  inline-size: var(--bg-width, 100%);
+  block-size: var(--bg-height, 100%);
+  border-radius: var(--bg-radius, 0);
+  object-fit: var(--bg-object-fit, cover);
+  object-position: var(--bg-object-position, center);
+  z-index: var(--bg-z-index, -2);
+  border-radius: var(--bg-radius, 0);
+}
+
+:is(*, img, figure, picture).is-bg > img {
+  position: absolute;
+  z-index: var(--bg-img-z-index, -2);
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: var(--bg-object-fit, cover);
+  object-position: var(--bg-object-position, center);
+}
+
+.bg--ultra-light {
+  background-color: var(--bg-ultra-light);
+}
+.bg--light {
+  background-color: var(--bg-light);
+}
+.bg--dark {
+  background-color: var(--bg-dark);
+}
+.bg--ultra-dark {
+  background-color: var(--bg-ultra-dark);
+}
+.text--light.text--light,
+.text--light.text--light :where(:is(h1, h2, h3, h4, h5, h6)) {
+  color: var(--text-light);
+}
+.text--light-muted.text--light-muted,
+.text--light-muted.text--light-muted :where(:is(h1, h2, h3, h4, h5, h6)) {
+  color: var(--text-light-muted);
+}
+.text--dark.text--dark,
+.text--dark.text--dark :where(:is(h1, h2, h3, h4, h5, h6)) {
+  color: var(--text-dark);
+}
+.text--dark-muted.text--dark-muted,
+.text--dark-muted.text--dark-muted :where(:is(h1, h2, h3, h4, h5, h6)) {
+  color: var(--text-dark-muted);
+}
+
 :root,
 .color-scheme--main {
   --bg-ultra-light-text: var(--text-dark);
@@ -701,33 +759,6 @@ h6 a {
   --btn-border-color-hover: var(--base-hover);
   --focus-color: var(--base-dark);
 }
-.btn--action {
-  --btn-background: var(--action);
-  --btn-background-hover: hsl(
-    var(--action-h),
-    var(--action-s),
-    calc(1.1 * var(--action-l))
-  );
-  --btn-text-color: var(--white);
-  --btn-text-color-hover: var(--white);
-  --btn-border-color: var(--action);
-  --btn-border-color-hover: hsl(
-    var(--action-h),
-    var(--action-s),
-    calc(1.1 * var(--action-l))
-  );
-  --focus-color: var(--action);
-}
-.btn--action.btn--outline {
-  --btn-background: transparent;
-  --btn-background-hover: var(--action-hover);
-  --btn-text-color: var(--action);
-  --btn-text-color-hover: var(--action-ultra-light);
-  --btn-border-width: 0.25rem;
-  --btn-border-color: var(--action);
-  --btn-border-color-hover: var(--action-hover);
-  --focus-color: var(--action);
-}
 .btn--black {
   --btn-background: var(--black);
   --btn-background-hover: var(--white);
@@ -735,7 +766,7 @@ h6 a {
   --btn-text-color-hover: var(--black);
   --btn-border-color: var(--black);
   --btn-border-color-hover: var(--white);
-  --focus-color: var(--action);
+  --focus-color: var(--accent);
 }
 .btn--black.btn--outline {
   --btn-background: transparent;
@@ -745,28 +776,28 @@ h6 a {
   --btn-border-width: 0.25rem;
   --btn-border-color: var(--black);
   --btn-border-color-hover: var(--white);
-  --focus-color: var(--action);
+  --focus-color: var(--accent);
 }
 .btn--white {
   --btn-background: var(--white);
-  --btn-background-hover: var(--action-hover);
+  --btn-background-hover: var(--accent-hover);
   --btn-text-color: var(--black);
   --btn-text-color-hover: var(--white);
   --btn-border-color: var(--white);
   --btn-border-color-hover: var(--black);
-  --focus-color: var(--action);
+  --focus-color: var(--accent);
 }
 .btn--white.btn--outline {
   --btn-background: transparent;
   --btn-background-hover: var(--white);
   --btn-text-color: var(--white);
-  --btn-text-color-hover: var(--action-ultra-light);
+  --btn-text-color-hover: var(--accent-ultra-light);
   --btn-border-width: 0.25rem;
   --btn-border-color: var(--white);
   --btn-border-color-hover: var(--white);
-  --focus-color: var(--action);
+  --focus-color: var(--accent);
 }
-[class*="btn--"]:where(:not(.btn--none, .wp-block-button)) {
+[class*="btn--"]:where(:not(.btn--none)) {
   background: var(--btn-background);
   color: var(--btn-text-color);
   padding-block: var(--btn-padding-block);
@@ -788,14 +819,15 @@ h6 a {
   text-align: var(--btn-text-align, center);
 }
 @media (hover: hover) and (pointer: fine) {
-  [class*="btn--"]:where(:not(.btn--none, .wp-block-button)):hover {
+  [class*="btn--"]:where(:not(.btn--none)):not(:disabled):hover {
+    cursor: pointer;
     background: var(--btn-background-hover);
     color: var(--btn-text-color-hover);
     border-color: var(--btn-border-color-hover);
     text-decoration: var(--btn-text-decoration-hover);
   }
 }
-[class*="btn--"]:where(:not(.btn--none, .wp-block-button)):focus {
+[class*="btn--"]:where(:not(.btn--none)):focus {
   outline-style: solid;
   outline-color: var(--focus-color);
   outline-width: var(--focus-width);
@@ -925,76 +957,6 @@ ol.list--none,
 // ############################################################################
 // >>> Link
 
-.link--action {
-  --link-color: var(--action);
-  --link-color-hover: var(--action-hover);
-}
-.link-hover--action.link-hover--action {
-  --link-color-hover: var(--action);
-}
-.link--action-hover {
-  --link-color: var(--action-hover);
-  --link-color-hover: var(--action-hover-hover);
-}
-.link-hover--action-hover.link-hover--action-hover {
-  --link-color-hover: var(--action-hover);
-}
-.link--action-ultra-light {
-  --link-color: var(--action-ultra-light);
-  --link-color-hover: var(--action-ultra-light-hover);
-}
-.link-hover--action-ultra-light.link-hover--action-ultra-light {
-  --link-color-hover: var(--action-ultra-light);
-}
-.link--action-light {
-  --link-color: var(--action-light);
-  --link-color-hover: var(--action-light-hover);
-}
-.link-hover--action-light.link-hover--action-light {
-  --link-color-hover: var(--action-light);
-}
-.link--action-semi-light {
-  --link-color: var(--action-semi-light);
-  --link-color-hover: var(--action-semi-light-hover);
-}
-.link-hover--action-semi-light.link-hover--action-semi-light {
-  --link-color-hover: var(--action-semi-light);
-}
-.link--action-semi-dark {
-  --link-color: var(--action-semi-dark);
-  --link-color-hover: var(--action-semi-dark-hover);
-}
-.link-hover--action-semi-dark.link-hover--action-semi-dark {
-  --link-color-hover: var(--action-semi-dark);
-}
-.link--action-dark {
-  --link-color: var(--action-dark);
-  --link-color-hover: var(--action-dark-hover);
-}
-.link-hover--action-dark.link-hover--action-dark {
-  --link-color-hover: var(--action-dark);
-}
-.link--action-ultra-dark {
-  --link-color: var(--action-ultra-dark);
-  --link-color-hover: var(--action-ultra-dark-hover);
-}
-.link-hover--action-ultra-dark.link-hover--action-ultra-dark {
-  --link-color-hover: var(--action-ultra-dark);
-}
-.link--action-comp {
-  --link-color: var(--action-comp);
-  --link-color-hover: var(--action-comp-hover);
-}
-.link-hover--action-comp.link-hover--action-comp {
-  --link-color-hover: var(--action-comp);
-}
-.link--action-medium {
-  --link-color: var(--action-medium);
-  --link-color-hover: var(--action-medium-hover);
-}
-.link-hover--action-medium.link-hover--action-medium {
-  --link-color-hover: var(--action-medium);
-}
 .link--primary {
   --link-color: var(--primary);
   --link-color-hover: var(--primary-hover);
@@ -1362,4 +1324,5 @@ ol.list--none,
 
 // >>> Link
 
+@import "overlay";
 @import "breakpoints";

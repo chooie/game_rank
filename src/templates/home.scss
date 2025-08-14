@@ -1,4 +1,15 @@
+/*
+Don't delete this page. It's an example of how to use a 'page' stylesheet
+*/
+
 .home-section-intro {
-  background: var(--base);
-  color: var(--text-light);
+  --inset-space: calc(2 * var(--gutter));
+  --bg-inset: calc(-1 * var(--inset-space));
+  --bg-height: calc(100% + (2 * var(--inset-space)));
+  --bg-width: calc(100% + (2 * var(--inset-space)));
+  --bg-radius: var(--radius);
+
+  &.bg--dark :where(h1, h2, h3, h4, h5, h6) {
+    --bg-dark-heading: var(--accent-light);
+  }
 }

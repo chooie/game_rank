@@ -1,8 +1,10 @@
-import dotenv from "dotenv";
-import express from "express";
-import { engine } from "express-handlebars";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import dotenv from "dotenv";
+import { Eta } from "eta";
+import express from "express";
+import { engine } from "express-handlebars";
 
 // Load env
 dotenv.config();
@@ -17,24 +19,27 @@ const app = express();
 const APP_NAME = "Game Rank";
 const PORT = Number(process.env.PORT) || 3000;
 const IS_DEV = process.env.NODE_ENV === "development";
+const IS_DEBUG = true;
 
 // Handlebars
 app.engine(
-  "handlebars",
+  "hbs",
   engine({
-    defaultLayout: "base", // templates/layouts/base.handlebars
-    extname: ".handlebars",
+    defaultLayout: "base", // templates/layouts/base.hbs
+    extname: ".hbs",
     helpers: {
+      debug_json: (context) => JSON.stringify(context, null, 2),
       shout: (text = "") => String(text).toUpperCase(),
     },
   }),
 );
-app.set("view engine", "handlebars");
+app.set("view engine", "hbs");
 app.set("views", VIEWS_DIR);
 
-// App locals (available in all templates)
-app.locals.appName = APP_NAME;
-app.locals.isDev = IS_DEV;
+const eta = new Eta({
+  views: VIEWS_DIR,
+  cache: true && !IS_DEV,
+});
 
 // Middleware
 app.use(express.json());
@@ -42,12 +47,27 @@ app.use(express.json());
 // Everything can be served from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));
 
+const clicked_route = "/home/htmx/clicked";
+
+// ==========================
 // Routes
-app.get("/", (req, res) => {
-  res.render("home", {
+// ==========================
+
+app.get("/", (req, res, next) => {
+  const html = eta.render("home", {
     title: `Home — ${APP_NAME}`,
     page: "home",
-    message: "Hello from Handlebars!",
+    message: "Hello from Eta!",
+    htmx_routes: { clicked: clicked_route },
+  });
+  res.send(html);
+});
+
+app.get(clicked_route, (req, res) => {
+  res.render("home__server_time", {
+    layout: false, // important: no main layout
+    message: "Server says hello 👋",
+    serverTime: new Date().toLocaleTimeString(),
   });
 });
 
