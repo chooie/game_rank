@@ -27,6 +27,14 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS games (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    rank INTEGER UNIQUE NOT NULL
+  )
+`);
+
 const app = express();
 
 const APP_NAME = "Game Rank";
@@ -41,6 +49,10 @@ app.engine(
   engine({
     defaultLayout: "base", // templates/layouts/base.hbs
     extname: ".hbs",
+    layoutsDir: path.join(VIEWS_DIR, "layouts"),
+    // Make *all* .hbs files under templates/ available as partials,
+    // so sibling partials like templates/games__list.hbs work:
+    partialsDir: VIEWS_DIR,
     helpers: {
       debug_json: (context) => JSON.stringify(context, null, 2),
       shout: (text = "") => String(text).toUpperCase(),
@@ -52,6 +64,8 @@ app.set("views", VIEWS_DIR);
 
 // Middleware
 app.use(express.json());
+// Needed for form submissions
+app.use(express.urlencoded({ extended: false }));
 
 // Everything can be served from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));

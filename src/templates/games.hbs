@@ -1,0 +1,27 @@
+<style>
+  .games-intro {
+    --inset-space: calc(2 * var(--gutter));
+    --bg-inset: calc(-1 * var(--inset-space));
+    --bg-height: calc(100% + (2 * var(--inset-space)));
+    --bg-width: calc(100% + (2 * var(--inset-space)));
+    --bg-radius: var(--radius);
+
+    &.bg--dark :where(h1, h2, h3, h4, h5, h6) {
+      --bg-dark-heading: var(--accent-light);
+    }
+  }
+</style>
+
+<section class="section games-intro">
+  <div class="section__inner">
+    <div class="is-bg overlay--neutral-light-trans-50">
+      <img
+        src="/img//imperial_guard_warhammer_2.jpg"
+        alt="Warhammer 40k battle with Imperial Guard"
+      />
+    </div>
+    <h1>Games</h1>
+
+    {{> games__list }}
+  </div>
+</section>

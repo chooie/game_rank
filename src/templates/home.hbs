@@ -33,13 +33,17 @@
     <h2>HTMX DB Example</h2>
     <button
       class="btn--primary"
-      hx-post="{{htmx_routes.insert_users}}"
+      hx-post="{{htmx_routes.users}}"
       hx-trigger="click"
       hx-target="#users-display"
       hx-swap="innerHTML"
     >
       Create more users!
     </button>
-    <div id="users-display"></div>
+    <div
+      id="users-display"
+      hx-get="{{htmx_routes.users}}"
+      hx-trigger="load"
+    ></div>
   </div>
 </section>

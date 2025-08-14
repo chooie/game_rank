@@ -1,0 +1,39 @@
+<div id="games-wrapper">
+  <h2>Add a Game</h2>
+
+  <form action="{{routes.games}}" method="post"
+        hx-post="{{routes.games}}"
+        hx-target="#games-wrapper"
+        hx-swap="outerHTML">
+    <label>
+      Title:
+      <input type="text" name="title" required
+             value="{{#if old}}{{old.title}}{{/if}}" />
+      {{#if errors.title}}
+        <span class="error">{{errors.title}}</span>
+      {{/if}}
+    </label>
+
+    <label>
+      Rank:
+      <input type="number" name="rank" min="1"
+             value="{{#if old}}{{old.rank}}{{/if}}" />
+      {{#if errors.rank}}
+        <span class="error">{{errors.rank}}</span>
+      {{/if}}
+    </label>
+
+    <button type="submit">Add</button>
+
+    {{#if errors._form}}
+      <div class="error">{{errors._form}}</div>
+    {{/if}}
+  </form>
+
+  <h2>Games</h2>
+  <ul id="games-list">
+    {{#each games}}
+      <li>{{rank}}: {{title}}</li>
+    {{/each}}
+  </ul>
+</div>

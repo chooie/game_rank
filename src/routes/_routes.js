@@ -1,7 +1,9 @@
 import createHomeRoutes from "./home.js";
+import createGameRoutes from "./games.js";
 
 export default function registerRoutes(app, db) {
   app.use("/", createHomeRoutes({ db }));
+  app.use("/", createGameRoutes({ db }));
 
   app.get("/healthz", (_req, res) => res.send("ok"));
 
