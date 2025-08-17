@@ -1,3 +1,5 @@
+<script src="/vendor/js/sortablejs/Sortable.js"></script>
+
 <div id="games-wrapper">
   <h2>Add a Game</h2>
 
@@ -31,9 +33,76 @@
   </form>
 
   <h2>Games</h2>
-  <ul id="games-list">
-    {{#each games}}
-      <li>{{rank}}: {{title}}</li>
-    {{/each}}
-  </ul>
+
+  <!-- Sortable form -->
+  <form class="sortable"
+        hx-post="{{routes.games_reorder}}"
+        hx-trigger="end"
+        hx-target="#games-wrapper"
+        hx-swap="outerHTML">
+    <div class="htmx-indicator">Updating…</div>
+
+    <ul id="games-list">
+      {{#each games}}
+        <li class="game-row">
+          <!-- Hidden input carries ID in DOM order -->
+          <input type="hidden" name="game" value="{{id}}" />
+          <span class="drag-handle" aria-hidden="true">⠿</span>
+          <span class="game-title">{{rank}}: {{title}}</span>
+        </li>
+      {{/each}}
+    </ul>
+  </form>
 </div>
+
+<style>
+  /* Optional niceties */
+  #games-list { list-style: none; padding: 0; margin: 0; }
+  .game-row { display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border: 1px solid #ddd; border-radius: .5rem; margin-bottom: .5rem; }
+  .drag-handle { cursor: grab; }
+  .blue-background-class { background: rgba(0, 120, 255, .1); }
+</style>
+
+<script>
+  // Works for both ESM and non-module include above
+  (function () {
+    function initSortables(root) {
+      var sortables = root.querySelectorAll(".sortable");
+      for (var i = 0; i < sortables.length; i++) {
+        (function (sortableForm) {
+          var list = sortableForm.querySelector("#games-list");
+          if (!list) return;
+
+          var sortableInstance = new Sortable(list, {
+            animation: 150,
+            ghostClass: 'blue-background-class',
+
+            // Make the `.htmx-indicator` unsortable
+            filter: ".htmx-indicator",
+            onMove: function (evt) {
+              return evt.related.className.indexOf('htmx-indicator') === -1;
+            },
+
+            // Disable sorting during request to prevent jitter
+            onEnd: function () {
+              this.option("disabled", true);
+              // HTMX will submit because hx-trigger="end" is on the form
+            }
+          });
+
+          // Re-enable after HTMX swaps in the new content
+          sortableForm.addEventListener("htmx:afterSwap", function () {
+            sortableInstance.option("disabled", false);
+          });
+        })(sortables[i]);
+      }
+    }
+
+    if (window.htmx) {
+      htmx.onLoad(initSortables);
+    } else {
+      // Fallback if not using HTMX onLoad (e.g., first paint)
+      document.addEventListener("DOMContentLoaded", function () { initSortables(document); });
+    }
+  })();
+</script>
