@@ -31,7 +31,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    rank INTEGER UNIQUE NOT NULL
+    rank INTEGER NOT NULL
   )
 `);
 
