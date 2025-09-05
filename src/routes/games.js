@@ -1,10 +1,12 @@
 import { Router } from "express";
 
 const games_route = "/games";
+const games_reorder_route = "/games/reorder";
 
 export default function createGameRoutes({ db }) {
   const router = Router();
 
+  // Queries
   const get_all_games = db.prepare("SELECT * FROM games ORDER BY rank ASC");
   const get_max_rank = db.prepare(
     "SELECT COALESCE(MAX(rank), 0) AS maxRank FROM games",
@@ -15,40 +17,50 @@ export default function createGameRoutes({ db }) {
   const insert_game = db.prepare(
     "INSERT INTO games (title, rank) VALUES (?, ?)",
   );
+  const update_rank = db.prepare("UPDATE games SET rank = ? WHERE id = ?");
+  const select_ids = db.prepare("SELECT id FROM games");
 
+  // Insert transaction (shift others if inserting in the middle)
   const insertAtRankTx = db.transaction((title, rank) => {
     shift_ranks.run(rank);
     insert_game.run(title, rank);
   });
 
+  // Reorder transaction: ids[] is the new DOM order (top → bottom)
+  const reorderTx = db.transaction((orderedIds) => {
+    for (let i = 0; i < orderedIds.length; i++) {
+      // rank is 1-based
+      update_rank.run(i + 1, orderedIds[i]);
+    }
+  });
+
+  // Helpers
+  function renderFull(res, status, data) {
+    return res.status(status).render("games", { title: "Games", ...data });
+  }
+  function renderPartial(res, status, data) {
+    // This should render the same HTML that replaces #games-wrapper
+    return res.status(status).render("games__list", { layout: false, ...data });
+  }
+  function routes() {
+    return { games: games_route, games_reorder: games_reorder_route };
+  }
+
   router.get(games_route, (req, res) => {
     const games = get_all_games.all();
-    res.render("games", {
-      title: "Games",
-      page: "games",
-      games,
-      routes: { games: games_route },
-    });
+    return renderFull(res, 200, { page: "games", games, routes: routes() });
   });
 
   router.post(games_route, (req, res) => {
     const isHtmx = !!req.get("HX-Request");
-
-    // helpers to render error/success responses
-    const renderPartial = (status, data) =>
-      res.status(status).render("games__list", { layout: false, ...data });
-
-    const renderFull = (status, data) =>
-      res.status(status).render("games", { title: "Games", ...data });
 
     try {
       const { title, rank: rankRaw } = req.body ?? {};
       const errors = {};
       const old = { title: (title ?? "").trim(), rank: rankRaw };
 
-      // basic validation
       if (!old.title) errors.title = "Title is required.";
-      if (old.title.length < 3) {
+      if (old.title && old.title.length < 3) {
         errors.title = "The title must be at least 3 characters long.";
       }
 
@@ -62,55 +74,100 @@ export default function createGameRoutes({ db }) {
 
       if (Object.keys(errors).length > 0) {
         const games = get_all_games.all();
-        const payload = { games, routes: { games: games_route }, errors, old };
-        // ✅ 200 for HTMX so the swap happens; keep 422 for non-HTMX if you like
-        return isHtmx ? renderPartial(200, payload) : renderFull(422, payload);
+        const payload = { games, routes: routes(), errors, old };
+        return isHtmx
+          ? renderPartial(res, 200, payload)
+          : renderFull(res, 422, payload);
       }
 
-      // insert (auto-shift in the middle, append at end)
-      if (rank <= maxRank) {
-        insertAtRankTx(old.title, rank);
-      } else {
-        insert_game.run(old.title, rank);
-      }
+      if (rank <= maxRank) insertAtRankTx(old.title, rank);
+      else insert_game.run(old.title, rank);
 
       const games = get_all_games.all();
-
-      if (isHtmx) {
-        // return fresh wrapper (form + updated list)
-        return renderPartial(200, { games, routes: { games: games_route } });
-      }
-
-      // PRG for non-HTMX success
-      return res.redirect(games_route);
+      return isHtmx
+        ? renderPartial(res, 200, { games, routes: routes() })
+        : res.redirect(games_route);
     } catch (err) {
-      const msg = String(err?.message || "");
-      if (msg.includes("UNIQUE constraint failed: games.best_to_worst_rank")) {
-        const games = get_all_games.all();
-        const errors = { rank: "That rank is already taken. Try another." };
-        const old = {
-          title: (req.body?.title ?? "").trim(),
-          rank: req.body?.rank,
-        };
-        const payload = { games, routes: { games: games_route }, errors, old };
-        return req.get("HX-Request")
-          ? res.status(409).render("games__list", { layout: false, ...payload })
-          : res.status(409).render("games", { title: "Games", ...payload });
-      }
-
       console.error(err);
-      // generic error
       const games = get_all_games.all();
       const errors = { _form: "Failed to add game. Please try again." };
       const old = {
         title: (req.body?.title ?? "").trim(),
         rank: req.body?.rank,
       };
-      const payload = { games, routes: { games: games_route }, errors, old };
+      const payload = { games, routes: routes(), errors, old };
       return req.get("HX-Request")
-        ? res.status(500).render("games__list", { layout: false, ...payload })
-        : res.status(500).render("games", { title: "Games", ...payload });
+        ? renderPartial(res, 500, payload)
+        : renderFull(res, 500, payload);
     }
+  });
+
+  // NEW: reorder endpoint used by hx-post on drag end
+  router.post(games_reorder_route, (req, res) => {
+    const isHtmx = !!req.get("HX-Request");
+
+    // `game` comes from <input name="game" value="{{id}}"> in DOM order.
+    // It can be a string (single) or an array (multiple).
+    let idsRaw = req.body?.game;
+    if (idsRaw == null) {
+      const games = get_all_games.all();
+      const errors = { _form: "No items submitted." };
+      const payload = { games, routes: routes(), errors };
+      return isHtmx
+        ? renderPartial(res, 400, payload)
+        : renderFull(res, 400, payload);
+    }
+    if (!Array.isArray(idsRaw)) idsRaw = [idsRaw];
+
+    // Parse & validate
+    const orderedIds = idsRaw
+      .map((v) => Number.parseInt(String(v), 10))
+      .filter((n) => Number.isFinite(n));
+
+    if (orderedIds.length !== idsRaw.length) {
+      const games = get_all_games.all();
+      const errors = { _form: "Invalid item identifiers." };
+      const payload = { games, routes: routes(), errors };
+      return isHtmx
+        ? renderPartial(res, 400, payload)
+        : renderFull(res, 400, payload);
+    }
+
+    // Optional safety: ensure submitted ids match exactly the set in DB
+    const dbIds = select_ids.all().map((r) => r.id);
+    const sameCardinality = dbIds.length === orderedIds.length;
+    const sameSet =
+      sameCardinality &&
+      new Set(dbIds).size === new Set(orderedIds).size &&
+      orderedIds.every((id) => dbIds.includes(id));
+
+    if (!sameSet) {
+      const games = get_all_games.all();
+      const errors = { _form: "Submitted list does not match current items." };
+      const payload = { games, routes: routes(), errors };
+      return isHtmx
+        ? renderPartial(res, 409, payload)
+        : renderFull(res, 409, payload);
+    }
+
+    // Apply ranks (1-based) in a single transaction
+    try {
+      reorderTx(orderedIds);
+    } catch (e) {
+      console.error(e);
+      const games = get_all_games.all();
+      const errors = { _form: "Failed to reorder. Please try again." };
+      const payload = { games, routes: routes(), errors };
+      return isHtmx
+        ? renderPartial(res, 500, payload)
+        : renderFull(res, 500, payload);
+    }
+
+    // Return updated list (HTMX swap) or full page
+    const games = get_all_games.all();
+    return isHtmx
+      ? renderPartial(res, 200, { games, routes: routes() })
+      : renderFull(res, 200, { page: "games", games, routes: routes() });
   });
 
   return router;
