@@ -1,9 +1,11 @@
-<link rel="stylesheet" href="/dist/css/home.css" />
+{{ define "content" }}
+
+<link rel="stylesheet" href="/public/dist/css/home.css" />
 
 <section class="section bg--dark home-section-intro">
   <div class="section__inner">
     <div class="is-bg overlay--neutral-ultra-dark-trans-90">
-      <img src="/img/blade_runner.jpg" alt="" />
+      <img src="/public/img/blade_runner.jpg" alt="" />
     </div>
     <h1>Home Page</h1>
     <p>{{ .Message }}</p>
@@ -46,3 +48,5 @@
     ></div>
   </div>
 </section>
+
+{{ end }}

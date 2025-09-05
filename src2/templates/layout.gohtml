@@ -1,0 +1,27 @@
+{{ define "layout" }}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ .Title }}</title>
+
+    <link
+      rel="icon"
+      href="/public/favicon_IIT_32x32.webp"
+      type="image/webp"
+      sizes="32x32"
+    />
+
+    {{/* CSS */}}
+    <link rel="stylesheet" href="/public/vendor/css/normalize.css" />
+    <link rel="stylesheet" href="/public/dist/css/layouts/base.css" />
+  </head>
+  <body class="page-{{ .Page }}">
+    {{/* HTMX Core */}}
+    <script src="/public/vendor/js/htmx/htmx_2.0.6.js"></script>
+
+    <main class="main-wrap">{{ block "content" . }}{{ end }}</main>
+  </body>
+</html>
+{{ end }}

@@ -2,15 +2,7 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-  // Associate .njk with a templating language id
   "files.associations": {
-    "*.njk": "jinja-html" // or "nunjucks" depending on your extension
-  },
-
-  // Tell VS Code to use Prettier for that language id
-  "[jinja-html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[nunjucks]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "cSpell.words": ["HTMX"]
+    "*.gohtml": "html"
+  }
 }
