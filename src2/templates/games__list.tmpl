@@ -1,4 +1,5 @@
-<script src="/vendor/js/sortablejs/Sortable.js"></script>
+{{ define "games__list" }}
+<script src="/public/vendor/js/sortablejs/Sortable.js"></script>
 
 <div id="games-wrapper">
   <h2>Add a Game</h2>
@@ -49,7 +50,7 @@
   <form
     class="sortable"
     hx-post="{{ .Routes.GamesReorder }}"
-    hx-trigger="end"
+    hx-trigger="end from:#games-list"
     hx-target="#games-wrapper"
     hx-swap="outerHTML"
   >
@@ -60,11 +61,12 @@
         range.Games
       }}
       <li class="game-row">
-        <!-- Hidden input carries ID in DOM order -->
         <input type="hidden" name="game" value="{{ .ID }}" />
         <span class="drag-handle" aria-hidden="true">⠿</span>
         <span class="game-title">{{ .Rank }}: {{ .Title }}</span>
       </li>
+      {{ else }}
+      <li>No games yet.</li>
       {{
         end
       }}
@@ -73,7 +75,6 @@
 </div>
 
 <style>
-  /* Optional niceties */
   #games-list {
     list-style: none;
     padding: 0;
@@ -102,6 +103,10 @@
       var sortables = root.querySelectorAll(".sortable");
       for (var i = 0; i < sortables.length; i++) {
         (function (sortableForm) {
+          // Guard against double-init across multiple htmx swaps
+          if (sortableForm.dataset.sortableInit === "1") return;
+          sortableForm.dataset.sortableInit = "1";
+
           var list = sortableForm.querySelector("#games-list");
           if (!list) return;
 
@@ -110,7 +115,10 @@
             ghostClass: "blue-background-class",
             filter: ".htmx-indicator",
             onMove: function (evt) {
-              return evt.related.className.indexOf("htmx-indicator") === -1;
+              return (
+                evt.related &&
+                evt.related.className.indexOf("htmx-indicator") === -1
+              );
             },
             onEnd: function () {
               this.option("disabled", true);
@@ -124,7 +132,7 @@
       }
     }
 
-    if (window.htmx) {
+    if (window.htmx && window.htmx.onLoad) {
       htmx.onLoad(initSortables);
     } else {
       document.addEventListener("DOMContentLoaded", function () {
@@ -133,3 +141,4 @@
     }
   })();
 </script>
+{{ end }}

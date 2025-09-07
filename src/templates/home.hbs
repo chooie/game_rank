@@ -6,7 +6,7 @@
       <img src="/img/blade_runner.jpg" alt="" />
     </div>
     <h1>Home Page</h1>
-    <p>{{ .Message }}</p>
+    <p>{{message}}</p>
   </div>
 </section>
 
@@ -16,7 +16,7 @@
     <div id="parent-element">
       <button
         class="btn--primary"
-        hx-get="{{ .HTMXRoutes.Clicked }}"
+        hx-get="{{htmx_routes.clicked}}"
         hx-trigger="click"
         hx-target="#parent-element"
         hx-swap="outerHTML"
@@ -32,7 +32,7 @@
     <h2>HTMX DB Example</h2>
     <button
       class="btn--primary"
-      hx-post="{{ .HTMXRoutes.Users }}"
+      hx-get="{{htmx_routes.users}}"
       hx-trigger="click"
       hx-target="#users-display"
       hx-swap="innerHTML"
@@ -41,7 +41,7 @@
     </button>
     <div
       id="users-display"
-      hx-get="{{ .HTMXRoutes.Users }}"
+      hx-get="{{htmx_routes.users}}"
       hx-trigger="load"
     ></div>
   </div>

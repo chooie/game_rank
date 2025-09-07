@@ -50,17 +50,21 @@ type Route string
 
 // Route constants
 const (
-	RouteHome        Route = "/"
-	RouteAnimals     Route = "/animals"
-	RouteHTMXClicked Route = "/home/htmx/clicked"
-	RouteHTMXUsers   Route = "/home/htmx/users"
+	RouteHome         Route = "/"
+	RouteAnimals      Route = "/animals"
+	RouteHTMXClicked  Route = "/home/htmx/clicked"
+	RouteHTMXUsers    Route = "/home/htmx/users"
+	RouteGames        Route = "/games"
+	RouteGamesReorder Route = "/games/reorder"
 )
 
 var routes = map[Route]http.HandlerFunc{
-	RouteHome:        HomeHandler,
-	RouteAnimals:     AnimalsHandler,
-	RouteHTMXClicked: HTMXClickedHandler,
-	RouteHTMXUsers:   HTMXUsersHandler,
+	RouteHome:         HomeHandler,
+	RouteAnimals:      AnimalsHandler,
+	RouteHTMXClicked:  HTMXClickedHandler,
+	RouteHTMXUsers:    HTMXUsersHandler,
+	RouteGames:        GamesHandler,
+	RouteGamesReorder: GamesReorderHandler,
 }
 
 func RegisterRoutes(mux *http.ServeMux, routes map[Route]http.HandlerFunc) {
@@ -108,7 +112,11 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	RenderTemplate("src2/templates/home.tmpl", p, w)
+	w.WriteHeader(http.StatusOK)
+	RenderTemplate(w, p, []string{
+		"src2/templates/layout.tmpl",
+		"src2/templates/home.tmpl",
+	})
 }
 
 type AnimalsParams struct {
@@ -125,7 +133,11 @@ func AnimalsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	RenderTemplate("src2/templates/animals.tmpl", p, w)
+	w.WriteHeader(http.StatusOK)
+	RenderTemplate(w, p, []string{
+		"src2/templates/layout.tmpl",
+		"src2/templates/animals.tmpl",
+	})
 }
 
 type ClickedParams struct {
@@ -141,6 +153,9 @@ func HTMXClickedHandler(w http.ResponseWriter, r *http.Request) {
 		ServerTime: now.Format("2006-01-02 15:04:05"), // YYYY-MM-DD HH:mm:ss
 	}
 
+	w.WriteHeader(http.StatusOK)
+	// This partial is assumed to be raw (no {{define}}). If you wrap it in define,
+	// switch to RenderPartialNamed and pass the defined name.
 	RenderPartial("src2/templates/clicked.tmpl", p, w)
 }
 
@@ -169,11 +184,11 @@ func HTMXUsersHandler(w http.ResponseWriter, r *http.Request) {
 			Users:          users,
 			RouteHTMXUsers: string(RouteHTMXUsers),
 		}
+		w.WriteHeader(http.StatusOK)
 		RenderPartial("src2/templates/home__users.tmpl", p, w)
 
 	case http.MethodPost:
 		name := sampleNames[rand.Intn(len(sampleNames))]
-
 		age := rand.Intn(60) + 18 // random age between 18 and 77
 
 		if _, err := db.ExecContext(r.Context(),
@@ -193,6 +208,7 @@ func HTMXUsersHandler(w http.ResponseWriter, r *http.Request) {
 			Users:          users,
 			RouteHTMXUsers: string(RouteHTMXUsers),
 		}
+		w.WriteHeader(http.StatusOK)
 		RenderPartial("src2/templates/home__users.tmpl", p, w)
 
 	case http.MethodDelete:
@@ -225,6 +241,7 @@ func HTMXUsersHandler(w http.ResponseWriter, r *http.Request) {
 			Users:          users,
 			RouteHTMXUsers: string(RouteHTMXUsers),
 		}
+		w.WriteHeader(http.StatusOK)
 		RenderPartial("src2/templates/home__users.tmpl", p, w)
 
 	default:
@@ -256,7 +273,224 @@ func fetchUsers(ctx context.Context) ([]map[string]any, error) {
 	return users, rows.Err()
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Games
+// ─────────────────────────────────────────────────────────────────────────────
+
+type Game struct {
+	ID    int64
+	Title string
+	Rank  int
+}
+
+type GamesRoutes struct {
+	Games        string
+	GamesReorder string
+}
+
+type GamesPageParams struct {
+	Base
+	Routes GamesRoutes
+	Old    *struct {
+		Title string
+		Rank  int
+	}
+	Errors map[string]string
+	Games  []Game
+}
+
+// GET /games → full page (layout) including wrapper partial
+// POST /games → validate/insert, return only wrapper partial for HTMX swap
+func GamesHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		games, err := fetchGames(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		p := GamesPageParams{
+			Base: Base{
+				Title:       "Games",
+				Page:        "games",
+				Description: "Rank your games.",
+			},
+			Routes: GamesRoutes{
+				Games:        string(RouteGames),
+				GamesReorder: string(RouteGamesReorder),
+			},
+			Games:  games,
+			Errors: map[string]string{},
+		}
+		// Include the partial file that defines {{ define "games__list" }}
+		w.WriteHeader(http.StatusOK)
+		RenderTemplate(w, p, []string{
+			"src2/templates/layout.tmpl",
+			"src2/templates/games.tmpl",
+			"src2/templates/games__list.tmpl",
+		})
+
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		title := r.FormValue("title")
+		rankStr := r.FormValue("rank")
+
+		var rank int
+		if rankStr != "" {
+			if n, err := strconv.Atoi(rankStr); err == nil {
+				rank = n
+			}
+		}
+
+		errors := map[string]string{}
+		if title == "" {
+			errors["title"] = "Title is required"
+		}
+		if rank <= 0 {
+			// Default to next rank if not provided
+			if next, err := nextRank(r.Context()); err == nil {
+				if rank == 0 {
+					rank = next
+				} else {
+					errors["rank"] = "Rank must be ≥ 1"
+				}
+			}
+		}
+
+		if len(errors) == 0 {
+			if _, err := db.ExecContext(r.Context(),
+				`INSERT INTO games(title, rank) VALUES(?, ?)`, title, rank); err != nil {
+				errors["_form"] = "Could not save game"
+				log.Println("insert game:", err)
+			}
+		}
+
+		games, err := fetchGames(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		p := GamesPageParams{
+			Routes: GamesRoutes{
+				Games:        string(RouteGames),
+				GamesReorder: string(RouteGamesReorder),
+			},
+			Old: &struct {
+				Title string
+				Rank  int
+			}{Title: title, Rank: rank},
+			Errors: errors,
+			Games:  games,
+		}
+		w.WriteHeader(http.StatusOK)
+		// Return ONLY the named partial (file uses {{ define "games__list" }})
+		RenderPartialNamed("src2/templates/games__list.tmpl", "games__list", p, w)
+
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+// POST /games/reorder → receives DOM order of inputs named "game" with values = IDs
+func GamesReorderHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ids := r.Form["game"] // DOM order
+	tx, err := db.BeginTx(r.Context(), nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for i, idStr := range ids {
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			_ = tx.Rollback()
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+		if _, err := tx.ExecContext(r.Context(),
+			`UPDATE games SET rank = ? WHERE id = ?`, i+1, id); err != nil {
+			_ = tx.Rollback()
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	games, err := fetchGames(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	p := GamesPageParams{
+		Routes: GamesRoutes{
+			Games:        string(RouteGames),
+			GamesReorder: string(RouteGamesReorder),
+		},
+		Errors: map[string]string{},
+		Games:  games,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	// Return the same named partial after reorder
+	RenderPartialNamed("src2/templates/games__list.tmpl", "games__list", p, w)
+}
+
+func fetchGames(ctx context.Context) ([]Game, error) {
+	rows, err := db.QueryContext(ctx, `SELECT id, title, rank FROM games ORDER BY rank ASC, id ASC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []Game
+	for rows.Next() {
+		var g Game
+		if err := rows.Scan(&g.ID, &g.Title, &g.Rank); err != nil {
+			return nil, err
+		}
+		out = append(out, g)
+	}
+	return out, rows.Err()
+}
+
+func nextRank(ctx context.Context) (int, error) {
+	var maxRank sql.NullInt64
+	err := db.QueryRowContext(ctx, `SELECT MAX(rank) FROM games`).Scan(&maxRank)
+	if err != nil {
+		return 1, err
+	}
+	if !maxRank.Valid {
+		return 1, nil
+	}
+	return int(maxRank.Int64) + 1, nil
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rendering
+// ─────────────────────────────────────────────────────────────────────────────
+
 func NotFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound) // send 404
+
 	p := BaseTemplateParams{
 		Base: Base{
 			Title:       "404 Not Found",
@@ -264,25 +498,35 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 			Description: "Sorry, we couldn’t find that page.",
 		},
 	}
-	RenderTemplate("src2/templates/404.tmpl", p, w)
+
+	RenderTemplate(w, p, []string{
+		"src2/templates/layout.tmpl",
+		"src2/templates/404.tmpl",
+	})
 }
 
-func RenderTemplate(template_path string, template_params any, w http.ResponseWriter) {
+// RenderTemplate parses and executes templates from a slice of file paths.
+// The first file in the slice should define the "layout" template.
+func RenderTemplate(w http.ResponseWriter, templateParams any, templatePaths []string) {
+	if len(templatePaths) == 0 {
+		http.Error(w, "no templates provided", http.StatusInternalServerError)
+		return
+	}
+
 	tmpl := template.Must(
-		template.New("layout").
+		template.New("all").
 			Option("missingkey=error").
-			ParseFiles("src2/templates/layout.tmpl", template_path),
+			ParseFiles(templatePaths...),
 	)
 
 	var buf bytes.Buffer
-	if err := tmpl.ExecuteTemplate(&buf, "layout", template_params); err != nil {
+	if err := tmpl.ExecuteTemplate(&buf, "layout", templateParams); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Only write to the response if template execution succeeded
-	w.WriteHeader(http.StatusOK)
-	buf.WriteTo(w)
+	// Caller must set the status code. We just write the body.
+	_, _ = buf.WriteTo(w)
 }
 
 func RenderPartial(templatePath string, templateParams any, w http.ResponseWriter) {
@@ -297,14 +541,34 @@ func RenderPartial(templatePath string, templateParams any, w http.ResponseWrite
 	)
 
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, templateParams); err != nil {
+	if err := tmpl.Execute(&buf, templateParams); err != nil { // executes root (raw partials)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Helpful default for HTMX; status must be set by caller.
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = buf.WriteTo(w)
+}
+
+// RenderPartialNamed parses a file that contains {{ define "name" }} ... {{ end }}
+// and executes that named template.
+func RenderPartialNamed(templatePath, templateName string, templateParams any, w http.ResponseWriter) {
+	tmpl := template.Must(
+		template.
+			New("partial").
+			Option("missingkey=error").
+			ParseFiles(templatePath),
+	)
+
+	var buf bytes.Buffer
+	if err := tmpl.ExecuteTemplate(&buf, templateName, templateParams); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	buf.WriteTo(w)
+	_, _ = buf.WriteTo(w)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
