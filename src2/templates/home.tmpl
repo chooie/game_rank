@@ -8,7 +8,7 @@
       <img src="/public/img/blade_runner.jpg" alt="" />
     </div>
     <h1>Home Page</h1>
-    <p>{{ .Message }}</p>
+    <p>{{ .Description }}</p>
   </div>
 </section>
 
@@ -44,7 +44,7 @@
     <div
       id="users-display"
       hx-get="{{ .HTMXRoutes.Users }}"
-      hx-trigger="load"
+      hx-trigger="load once"
     ></div>
   </div>
 </section>

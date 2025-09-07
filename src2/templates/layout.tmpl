@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ .Title }}</title>
+    <title>{{ .Base.Title }}</title>
 
     <link
       rel="icon"
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/public/vendor/css/normalize.css" />
     <link rel="stylesheet" href="/public/dist/css/layouts/base.css" />
   </head>
-  <body class="page-{{ .Page }}">
+  <body class="page-{{ .Base.Page }}">
     {{/* HTMX Core */}}
     <script src="/public/vendor/js/htmx/htmx_2.0.6.js"></script>
 
