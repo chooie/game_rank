@@ -8,5 +8,6 @@
 
   "files.associations": {
     "*.tmpl": "html"
-  }
+  },
+  "cSpell.words": ["HTMX"]
 }
