@@ -1,7 +1,20 @@
 <ul>
-  {{range $i, $u := .Users}}
-  <li>{{ $i }}: {{ $u.name }} - {{ $u.age }}</li>
-  {{
-    end
-  }}
+  {{ range $i, $u := .Users }}
+  <li>
+    <p>{{ $i }}:
+      {{ index $u "name" }} -
+      {{ index $u "age" }}{{/*  -
+      {{ index $u "id" }}
+      */}}
+    </p>
+    <p>
+      <button
+        hx-delete="{{ $.RouteHTMXUsers }}?id={{ index $u "id" }}"
+        hx-target="#users-display"
+        hx-swap="innerHTML">
+        Delete
+      </button>
+    </p>
+  </li>
+  {{ end }}
 </ul>

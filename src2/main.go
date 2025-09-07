@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -150,7 +151,8 @@ var sampleNames = []string{
 }
 
 type UsersParams struct {
-	Users []map[string]any
+	Users          []map[string]any
+	RouteHTMXUsers string
 }
 
 // HTMXUsersHandler returns the users partial on both GET (list) and POST (insert + list)
@@ -162,13 +164,14 @@ func HTMXUsersHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		RenderPartial("src2/templates/home__users.tmpl", UsersParams{Users: users}, w)
+
+		p := UsersParams{
+			Users:          users,
+			RouteHTMXUsers: string(RouteHTMXUsers),
+		}
+		RenderPartial("src2/templates/home__users.tmpl", p, w)
 
 	case http.MethodPost:
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
 		name := sampleNames[rand.Intn(len(sampleNames))]
 
 		age := rand.Intn(60) + 18 // random age between 18 and 77
@@ -185,7 +188,44 @@ func HTMXUsersHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		RenderPartial("src2/templates/home__users.tmpl", UsersParams{Users: users}, w)
+
+		p := UsersParams{
+			Users:          users,
+			RouteHTMXUsers: string(RouteHTMXUsers),
+		}
+		RenderPartial("src2/templates/home__users.tmpl", p, w)
+
+	case http.MethodDelete:
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			http.Error(w, "missing id", http.StatusBadRequest)
+			return
+		}
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+
+		if _, err := db.ExecContext(r.Context(),
+			`DELETE FROM users WHERE id = ?`, id); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Return the updated users list (HTMX will swap it in)
+		users, err := fetchUsers(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		p := UsersParams{
+			Users:          users,
+			RouteHTMXUsers: string(RouteHTMXUsers),
+		}
+		RenderPartial("src2/templates/home__users.tmpl", p, w)
 
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
