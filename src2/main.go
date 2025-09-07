@@ -38,7 +38,7 @@ var routes = map[Route]http.HandlerFunc{
 	RouteHome:        HomeHandler,
 	RouteAnimals:     AnimalsHandler,
 	RouteHTMXClicked: HTMXClickedHandler,
-	// RouteHTMXUsers:   htmxUsersHandler,
+	RouteHTMXUsers:   HTMXUsersHandler,
 }
 
 func RegisterRoutes(mux *http.ServeMux, routes map[Route]http.HandlerFunc) {
@@ -120,6 +120,15 @@ func HTMXClickedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	RenderPartial("src2/templates/clicked.tmpl", p, w)
+}
+
+type UsersParams struct {
+}
+
+func HTMXUsersHandler(w http.ResponseWriter, r *http.Request) {
+	p := UsersParams{}
+
+	RenderPartial("src2/templates/home__users.tmpl", p, w)
 }
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
