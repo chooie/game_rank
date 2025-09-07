@@ -362,10 +362,30 @@ func GamesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(errors) == 0 {
-			if _, err := db.ExecContext(r.Context(),
+			tx, err := db.BeginTx(r.Context(), nil)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// Make room for the new game by pushing others down
+			if _, err := tx.ExecContext(r.Context(),
+				`UPDATE games SET rank = rank + 1 WHERE rank >= ?`, rank); err != nil {
+				_ = tx.Rollback()
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if _, err := tx.ExecContext(r.Context(),
 				`INSERT INTO games(title, rank) VALUES(?, ?)`, title, rank); err != nil {
-				errors["_form"] = "Could not save game"
-				log.Println("insert game:", err)
+				_ = tx.Rollback()
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if err := tx.Commit(); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 		}
 
