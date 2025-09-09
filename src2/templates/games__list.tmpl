@@ -64,6 +64,18 @@
         <input type="hidden" name="game" value="{{ .ID }}" />
         <span class="drag-handle" aria-hidden="true">⠿</span>
         <span class="game-title">{{ .Rank }}: {{ .Title }}</span>
+        <button
+          type="button"
+          class="delete-btn"
+          hx-delete="{{ $.Routes.Games }}?id={{ .ID }}"
+          hx-params="none"
+          hx-target="#games-wrapper"
+          hx-swap="outerHTML"
+          hx-confirm="Delete “{{ .Title }}”?"
+          hx-disabled-elt="this"
+        >
+          Delete
+        </button>
       </li>
       {{ else }}
       <li>No games yet.</li>
@@ -72,73 +84,73 @@
       }}
     </ul>
   </form>
-</div>
 
-<style>
-  #games-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .game-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  .drag-handle {
-    cursor: grab;
-  }
-  .blue-background-class {
-    background: rgba(0, 120, 255, 0.1);
-  }
-</style>
+  <style>
+    #games-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .game-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .drag-handle {
+      cursor: grab;
+    }
+    .blue-background-class {
+      background: rgba(0, 120, 255, 0.1);
+    }
+  </style>
 
-<script>
-  (function () {
-    function initSortables(root) {
-      var sortables = root.querySelectorAll(".sortable");
-      for (var i = 0; i < sortables.length; i++) {
-        (function (sortableForm) {
-          // Guard against double-init across multiple htmx swaps
-          if (sortableForm.dataset.sortableInit === "1") return;
-          sortableForm.dataset.sortableInit = "1";
+  <script>
+    (function () {
+      function initSortables(root) {
+        var sortables = root.querySelectorAll(".sortable");
+        for (var i = 0; i < sortables.length; i++) {
+          (function (sortableForm) {
+            // Guard against double-init across multiple htmx swaps
+            if (sortableForm.dataset.sortableInit === "1") return;
+            sortableForm.dataset.sortableInit = "1";
 
-          var list = sortableForm.querySelector("#games-list");
-          if (!list) return;
+            var list = sortableForm.querySelector("#games-list");
+            if (!list) return;
 
-          var sortableInstance = new Sortable(list, {
-            animation: 150,
-            ghostClass: "blue-background-class",
-            filter: ".htmx-indicator",
-            onMove: function (evt) {
-              return (
-                evt.related &&
-                evt.related.className.indexOf("htmx-indicator") === -1
-              );
-            },
-            onEnd: function () {
-              this.option("disabled", true);
-            },
-          });
+            var sortableInstance = new Sortable(list, {
+              animation: 150,
+              ghostClass: "blue-background-class",
+              filter: ".htmx-indicator",
+              onMove: function (evt) {
+                return (
+                  evt.related &&
+                  evt.related.className.indexOf("htmx-indicator") === -1
+                );
+              },
+              onEnd: function () {
+                this.option("disabled", true);
+              },
+            });
 
-          sortableForm.addEventListener("htmx:afterSwap", function () {
-            sortableInstance.option("disabled", false);
-          });
-        })(sortables[i]);
+            sortableForm.addEventListener("htmx:afterSwap", function () {
+              sortableInstance.option("disabled", false);
+            });
+          })(sortables[i]);
+        }
       }
-    }
 
-    if (window.htmx && window.htmx.onLoad) {
-      htmx.onLoad(initSortables);
-    } else {
-      document.addEventListener("DOMContentLoaded", function () {
-        initSortables(document);
-      });
-    }
-  })();
-</script>
-{{ end }}
+      if (window.htmx && window.htmx.onLoad) {
+        htmx.onLoad(initSortables);
+      } else {
+        document.addEventListener("DOMContentLoaded", function () {
+          initSortables(document);
+        });
+      }
+    })();
+  </script>
+  {{ end }}
+</div>

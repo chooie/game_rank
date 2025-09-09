@@ -299,8 +299,9 @@ type GamesPageParams struct {
 	Games  []Game
 }
 
-// GET /games → full page (layout) including wrapper partial
+// GET /games  → full page (layout) including wrapper partial
 // POST /games → validate/insert, return only wrapper partial for HTMX swap
+// DELETE /games?id=123 (or hx-vals) → delete & return only wrapper partial
 func GamesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -347,8 +348,8 @@ func GamesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		errors := map[string]string{}
-		if title == "" {
-			errors["title"] = "Title is required"
+		if len(title) <= 3 {
+			errors["title"] = "Title is required and must be at least 3 characters"
 		}
 		if rank <= 0 {
 			// Default to next rank if not provided
@@ -409,6 +410,76 @@ func GamesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 		// Return ONLY the named partial (file uses {{ define "games__list" }})
+		RenderPartialNamed("src2/templates/games__list.tmpl", "games__list", p, w)
+
+	case http.MethodDelete:
+		// Accept id from query (?id=123) or from form body (hx-vals)
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			_ = r.ParseForm()
+			idStr = r.FormValue("id")
+		}
+		id, err := strconv.Atoi(idStr)
+		if err != nil || id <= 0 {
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+
+		tx, err := db.BeginTx(r.Context(), nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Look up the rank so we can compact after deletion
+		var oldRank int
+		if err := tx.QueryRowContext(r.Context(),
+			`SELECT rank FROM games WHERE id = ?`, id).Scan(&oldRank); err != nil {
+			_ = tx.Rollback()
+			if err == sql.ErrNoRows {
+				http.Error(w, "not found", http.StatusNotFound)
+				return
+			}
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Delete the row
+		if _, err := tx.ExecContext(r.Context(),
+			`DELETE FROM games WHERE id = ?`, id); err != nil {
+			_ = tx.Rollback()
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Close the gap: shift down ranks above the deleted one
+		if _, err := tx.ExecContext(r.Context(),
+			`UPDATE games SET rank = rank - 1 WHERE rank > ?`, oldRank); err != nil {
+			_ = tx.Rollback()
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := tx.Commit(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Re-render the list
+		games, err := fetchGames(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		p := GamesPageParams{
+			Routes: GamesRoutes{
+				Games:        string(RouteGames),
+				GamesReorder: string(RouteGamesReorder),
+			},
+			Games:  games,
+			Errors: map[string]string{},
+		}
+		w.WriteHeader(http.StatusOK)
 		RenderPartialNamed("src2/templates/games__list.tmpl", "games__list", p, w)
 
 	default:
